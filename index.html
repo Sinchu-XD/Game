@@ -1,70 +1,70 @@
-<!--
-Multi-Game Single-File Web App (HTML/CSS/JS)
-Filename: netlify-multi-games.html
-
-Included games:
- - Tic-Tac-Toe (XOX)
- - SOS (5x5 grid, point-scoring)
- - Rock Paper Scissors
-
-How to host on Netlify (quick):
- 1) Option A (drag & drop):
-    - Go to https://app.netlify.com/sites
-    - Create a new site -> "Deploy site" -> drag-and-drop this HTML file into the window.
-    - Done. Netlify will host the static file.
- 2) Option B (GitHub):
-    - Create a new repository, add this file as index.html in the repo root.
-    - On Netlify, "New site from Git" -> connect GitHub and pick the repo -> Deploy.
-
-This single file is self-contained and mobile-friendly.
--->
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Mini Games — XOX • SOS • RPS</title>
+  <title>Mini Games — XOX & SOS</title>
   <style>
-    :root{--bg:#0f1720;--card:#0b1220;--accent:#7dd3fc;--muted:#9ca3af;--glass:rgba(255,255,255,0.03)}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
-    body{background:linear-gradient(180deg,#071024 0%, #071a2a 100%);color:#e6eef8;display:flex;align-items:center;justify-content:center;padding:20px}
-    .app{width:100%;max-width:980px}
+    :root{
+      --bg:#000000; --card:#0b0b0b; --muted:#9ca3af;
+      --x-color:#ff4d4d; --o-color:#4da6ff; --border:#ffffff;
+      --glass:rgba(255,255,255,0.04);
+    }
+    [data-theme='light']{ --bg:#f7f9fb; --card:#ffffff; --muted:#6b7280; --x-color:#b91c1c; --o-color:#0369a1; --border:#111827; }
+
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:var(--bg);color:var(--o-color);display:flex;align-items:flex-start;justify-content:center;padding:28px}
+    .app{width:100%;max-width:1100px}
     header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
-    h1{font-size:20px;margin:0}
+    h1{font-size:20px;margin:0;color:var(--o-color)}
     .controls{display:flex;gap:8px;flex-wrap:wrap}
-    button{background:var(--glass);border:1px solid rgba(255,255,255,0.04);color:inherit;padding:8px 10px;border-radius:8px;cursor:pointer}
-    .board-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:16px;box-shadow:0 6px 18px rgba(0,0,0,0.6);}
-    .layout{display:grid;grid-template-columns:1fr 320px;gap:16px}
-    @media (max-width:900px){.layout{grid-template-columns:1fr} .sidebar{order:2}}
+    .btn{background:transparent;border:1px solid var(--glass);color:inherit;padding:8px 12px;border-radius:8px;cursor:pointer}
+
+    .layout{display:grid;grid-template-columns:1fr 360px;gap:18px}
+    @media (max-width:960px){.layout{grid-template-columns:1fr} .sidebar{order:2}}
+
+    .board-card{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 8px 30px rgba(0,0,0,0.6);border:2px solid transparent}
+
+    /* Shared */
+    .game{min-height:260px}
+    .muted{color:var(--muted);font-size:13px}
+    .status{margin-top:8px;font-weight:700}
 
     /* TicTacToe styles */
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:360px;margin:12px 0}
-    .cell{aspect-ratio:1/1;background:transparent;border:2px dashed rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:700;cursor:pointer;border-radius:10px}
+    .ttt-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+    .score-big{flex:1;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:12px;border-radius:10px;text-align:center}
+    .score-big .who{font-size:18px;font-weight:800}
+    .score-big .score{font-size:36px;font-weight:900;color:var(--border);}
 
-    /* SOS styles */
-    .sos-grid{display:grid;gap:6px;background:transparent;border-radius:8px;padding:6px}
-    .sos-cell{min-width:40px;min-height:40px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:rgba(255,255,255,0.02);cursor:pointer;font-weight:700}
+    .ttt-controls{display:flex;gap:8px;align-items:center}
+    .ttt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:420px;margin:12px auto}
+    .cell{aspect-ratio:1/1;background:var(--bg);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:72px;font-weight:900;cursor:pointer;border-radius:12px;color:var(--muted);}
+    .cell.x{color:var(--x-color)}
+    .cell.o{color:var(--o-color)}
 
-    /* RPS styles */
-    .rps-row{display:flex;gap:8px;margin-top:12px}
+    /* Player name inputs */
+    .name-inputs{display:flex;gap:8px;align-items:center}
+    input[type=text]{background:transparent;border:1px solid var(--glass);padding:8px;border-radius:8px;color:inherit}
 
-    .status{color:var(--accent);margin-top:8px;font-weight:600}
-    .muted{color:var(--muted);font-size:13px}
-    footer{margin-top:12px;color:var(--muted);font-size:13px}
-    .score-row{display:flex;gap:12px;align-items:center}
-    .score{background:rgba(255,255,255,0.03);padding:8px;border-radius:8px}
+    /* SOS styles (10x10) */
+    .sos-top{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+    .sos-grid{display:grid;gap:6px;max-width:540px;margin:12px auto}
+    .sos-cell{aspect-ratio:1/1;background:var(--bg);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;cursor:pointer;border-radius:6px;color:var(--muted);font-size:18px}
+    .sos-cell.s{color:var(--x-color)}
+    .sos-cell.o{color:var(--o-color)}
+
+    .small{font-size:13px;color:var(--muted)}
   </style>
 </head>
 <body>
   <div class="app">
     <header>
-      <h1>Mini Games — Play online (Deploy on Netlify)</h1>
+      <h1>Mini Games — XOX & SOS</h1>
       <div style="flex:1"></div>
       <div class="controls">
-        <button onclick="switchGame('tictactoe')">Tic‑Tac‑Toe (XOX)</button>
-        <button onclick="switchGame('sos')">SOS</button>
-        <button onclick="switchGame('rps')">Rock‑Paper‑Scissors</button>
+        <button class="btn" onclick="switchGame('tictactoe')">Tic‑Tac‑Toe (XOX)</button>
+        <button class="btn" onclick="switchGame('sos')">SOS (10×10)</button>
+        <button class="btn" id="themeToggle" onclick="toggleTheme()">Toggle Light/Dark</button>
       </div>
     </header>
 
@@ -72,100 +72,122 @@ This single file is self-contained and mobile-friendly.
       <main class="board-card">
         <!-- TicTacToe -->
         <section id="tictactoe" class="game" style="display:none">
-          <div class="score-row"><div class="score">X: <span id="ttt-x">0</span></div><div class="score">O: <span id="ttt-o">0</span></div><div style="flex:1"></div><button onclick="resetTicTacToe()">Reset</button></div>
-          <div class="grid" id="ttt-grid"></div>
+          <div class="ttt-top">
+            <div class="score-big">
+              <div class="who">Player <span id="p1-name-display">X</span></div>
+              <div class="score" id="p1-score">0</div>
+            </div>
+            <div style="width:12px"></div>
+            <div class="score-big">
+              <div class="who">Player <span id="p2-name-display">O</span></div>
+              <div class="score" id="p2-score">0</div>
+            </div>
+          </div>
+
+          <div class="ttt-controls">
+            <div class="name-inputs">
+              <input id="p1-name" type="text" placeholder="Player X name" oninput="updateNames()">
+              <input id="p2-name" type="text" placeholder="Player O name" oninput="updateNames()">
+            </div>
+            <div style="flex:1"></div>
+            <button class="btn" onclick="resetTicTacToe(true)">Reset Game & Scores</button>
+          </div>
+
+          <div class="ttt-grid" id="ttt-grid"></div>
           <div class="status" id="ttt-status"></div>
-          <div class="muted">Tap a cell to place mark. Two-player on same device.</div>
+          <div class="muted">Board shows big scores above. Tap a cell to place mark. Two-player on same device.</div>
         </section>
 
         <!-- SOS -->
         <section id="sos" class="game" style="display:none">
-          <div class="score-row"><div class="score">P1: <span id="sos-p1">0</span></div><div class="score">P2: <span id="sos-p2">0</span></div><div style="flex:1"></div><button onclick="resetSOS()">Reset</button></div>
-          <div style="margin-top:12px">Choose letter to place: <button onclick="selectSOS('S')">S</button> <button onclick="selectSOS('O')">O</button> <span class="muted">(Current: <strong id="sos-current">S</strong>)</span></div>
-          <div id="sos-board" style="margin-top:12px"></div>
-          <div class="status" id="sos-status"></div>
-          <div class="muted">Players alternate placing S or O on grid. Each time you create "SOS" horizontally, vertically, or diagonally you earn 1 point and play again. When the board fills game ends.</div>
-        </section>
-
-        <!-- RPS -->
-        <section id="rps" class="game" style="display:none">
-          <div class="score-row"><div class="score">You: <span id="rps-you">0</span></div><div class="score">CPU: <span id="rps-cpu">0</span></div><div style="flex:1"></div><button onclick="resetRPS()">Reset</button></div>
-          <div class="rps-row">
-            <button onclick="playRps('rock')">Rock</button>
-            <button onclick="playRps('paper')">Paper</button>
-            <button onclick="playRps('scissors')">Scissors</button>
+          <div class="sos-top">
+            <div class="score-big">
+              <div class="who">Player 1</div>
+              <div class="score" id="sos-p1">0</div>
+            </div>
+            <div class="score-big">
+              <div class="who">Player 2</div>
+              <div class="score" id="sos-p2">0</div>
+            </div>
+            <div style="flex:1"></div>
+            <button class="btn" onclick="resetSOS(true)">Reset</button>
           </div>
-          <div class="status" id="rps-status"></div>
-          <div class="muted">Simple single-player vs computer.</div>
+
+          <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:8px">
+            <div class="small">Choose letter:</div>
+            <button class="btn" onclick="selectSOS('S')">S</button>
+            <button class="btn" onclick="selectSOS('O')">O</button>
+            <div class="small">Current: <strong id="sos-current">S</strong></div>
+          </div>
+
+          <div id="sos-board" class="sos-grid"></div>
+          <div class="status" id="sos-status"></div>
+          <div class="muted">10×10 grid. Players alternate placing S or O. Each time you create "SOS" you score 1 and play again.</div>
         </section>
       </main>
 
-      <aside class="sidebar board-card" style="height:fit-content">
-        <h3>How to deploy on Netlify</h3>
-        <ol>
-          <li>Save this file as <code>index.html</code>.</li>
-          <li>Drag & drop to Netlify Sites dashboard OR push to a GitHub repo and connect Netlify.</li>
-          <li>Site will be live at a Netlify subdomain; configure custom domain if desired.</li>
-        </ol>
-        <hr>
-        <h4>Tips</h4>
-        <ul>
-          <li>To add more games, copy one of the sections and add logic in the JS area.</li>
-          <li>Netlify auto-refreshes deploys on git push if connected to GitHub.</li>
-        </ul>
-        <footer>Made for quick deployment — enjoy!</footer>
-      </aside>
+      <aside class="sidebar" style="display:none"></aside>
     </div>
   </div>
 
   <script>
-    // ---- Game switcher ----
+    // Game switcher
     function switchGame(name){
       document.querySelectorAll('.game').forEach(s=>s.style.display='none');
       const el=document.getElementById(name);
       if(el) el.style.display='block';
-      // initialize when showing
       if(name==='tictactoe') initTicTacToe();
       if(name==='sos') initSOS();
-      if(name==='rps') initRPS();
+    }
+
+    // Theme
+    function toggleTheme(){
+      const root = document.documentElement;
+      if(root.getAttribute('data-theme')==='light') root.removeAttribute('data-theme');
+      else root.setAttribute('data-theme','light');
     }
 
     // ---- Tic Tac Toe ----
     let tttState;
     function initTicTacToe(){
-      if(tttState) return; // keep state across view toggles
-      tttState={board:Array(9).fill(''),turn:'X',xscore:0,oscore:0};
-      const grid=document.getElementById('ttt-grid');grid.innerHTML='';
+      if(tttState) return;
+      tttState = {board:Array(9).fill(''), turn:'X', xscore:0, oscore:0};
+      const grid = document.getElementById('ttt-grid'); grid.innerHTML='';
       for(let i=0;i<9;i++){
-        const c=document.createElement('div');c.className='cell';c.dataset.index=i;c.onclick=()=>tttClick(i);
+        const c=document.createElement('div'); c.className='cell'; c.dataset.index=i; c.onclick=()=>tttClick(i);
         grid.appendChild(c);
       }
       updateTttUI();
+      // initialize names
+      document.getElementById('p1-name').value = '';
+      document.getElementById('p2-name').value = '';
+      updateNames();
+    }
+    function updateNames(){
+      const p1 = document.getElementById('p1-name').value || 'X';
+      const p2 = document.getElementById('p2-name').value || 'O';
+      document.getElementById('p1-name-display').textContent = p1;
+      document.getElementById('p2-name-display').textContent = p2;
     }
     function tttClick(i){
       if(tttState.board[i]) return;
-      tttState.board[i]=tttState.turn;
+      tttState.board[i] = tttState.turn;
       if(checkTttWin(tttState.board, tttState.turn)){
-        document.getElementById('ttt-status').textContent = tttState.turn + ' wins!';
+        const winner = tttState.turn === 'X' ? 'p1' : 'p2';
+        document.getElementById('ttt-status').textContent = (tttState.turn==='X'? (document.getElementById('p1-name-display').textContent) : (document.getElementById('p2-name-display').textContent)) + ' wins!';
         if(tttState.turn==='X') tttState.xscore++; else tttState.oscore++;
-        document.getElementById('ttt-x').textContent = tttState.xscore;
-        document.getElementById('ttt-o').textContent = tttState.oscore;
-        // freeze board
+        document.getElementById('p1-score').textContent = tttState.xscore;
+        document.getElementById('p2-score').textContent = tttState.oscore;
         renderTtt();
-        setTimeout(()=>{
-          // auto reset board but keep score
-          tttState.board = Array(9).fill('');
-          updateTttUI();
-          document.getElementById('ttt-status').textContent='';
-        },900);
+        setTimeout(()=>{ tttState.board = Array(9).fill(''); updateTttUI(); document.getElementById('ttt-status').textContent=''; },900);
         return;
       }
       if(tttState.board.every(Boolean)){
         document.getElementById('ttt-status').textContent='Draw!';
-        setTimeout(()=>{tttState.board = Array(9).fill(''); updateTttUI(); document.getElementById('ttt-status').textContent='';},900);
+        setTimeout(()=>{ tttState.board = Array(9).fill(''); updateTttUI(); document.getElementById('ttt-status').textContent=''; },900);
         return;
       }
-      tttState.turn = tttState.turn==='X'?'O':'X';
+      tttState.turn = tttState.turn === 'X' ? 'O' : 'X';
       updateTttUI();
     }
     function checkTttWin(b,player){
@@ -173,44 +195,42 @@ This single file is self-contained and mobile-friendly.
       return wins.some(arr=>arr.every(i=>b[i]===player));
     }
     function renderTtt(){
-      document.querySelectorAll('#ttt-grid .cell').forEach(c=>{c.textContent = tttState.board[c.dataset.index];});
+      document.querySelectorAll('#ttt-grid .cell').forEach(c=>{
+        const val = tttState.board[c.dataset.index];
+        c.textContent = val;
+        c.classList.remove('x','o');
+        if(val==='X') c.classList.add('x');
+        if(val==='O') c.classList.add('o');
+      });
     }
-    function updateTttUI(){
-      renderTtt();
-      document.getElementById('ttt-status').textContent = 'Turn: ' + tttState.turn;
-    }
-    function resetTicTacToe(){ tttState=null; document.getElementById('ttt-grid').innerHTML=''; initTicTacToe(); document.getElementById('ttt-x').textContent=0; document.getElementById('ttt-o').textContent=0; }
+    function updateTttUI(){ renderTtt(); document.getElementById('ttt-status').textContent = 'Turn: ' + (tttState.turn==='X'? document.getElementById('p1-name-display').textContent : document.getElementById('p2-name-display').textContent); }
+    function resetTicTacToe(fullReset){ tttState=null; document.getElementById('ttt-grid').innerHTML=''; initTicTacToe(); if(fullReset){ document.getElementById('p1-score').textContent=0; document.getElementById('p2-score').textContent=0; }}
 
-    // ---- SOS ----
+    // ---- SOS (10x10) ----
     let sosState;
     function initSOS(){
       if(sosState) return;
-      const size=5;
-      sosState={size:size,board:Array(size*size).fill(''),turn:1,selected:'S',score:[0,0]};
-      buildSosBoard();
-      updateSosUI();
+      const size = 10;
+      sosState = {size:size, board:Array(size*size).fill(''), turn:1, selected:'S', score:[0,0]};
+      buildSosBoard(); updateSosUI();
     }
     function buildSosBoard(){
-      const boardEl=document.getElementById('sos-board');boardEl.innerHTML='';
-      const s=sosState.size;
-      const grid=document.createElement('div');grid.className='sos-grid';grid.style.gridTemplateColumns = `repeat(${s}, 1fr)`;
+      const boardEl = document.getElementById('sos-board'); boardEl.innerHTML='';
+      const s = sosState.size;
+      const grid = document.createElement('div'); grid.className='sos-grid'; grid.style.gridTemplateColumns = `repeat(${s}, 1fr)`;
       for(let i=0;i<s*s;i++){
-        const c=document.createElement('div');c.className='sos-cell';c.dataset.index=i;c.onclick=()=>sosClick(i);
+        const c=document.createElement('div'); c.className='sos-cell'; c.dataset.index=i; c.onclick=()=>sosClick(i);
         grid.appendChild(c);
       }
       boardEl.appendChild(grid);
     }
     function selectSOS(letter){ sosState.selected = letter; document.getElementById('sos-current').textContent = letter; }
     function sosClick(i){
-      if(sosState.board[i]) return; // can't place
-      sosState.board[i]=sosState.selected;
+      if(sosState.board[i]) return;
+      sosState.board[i] = sosState.selected;
       const formed = countNewSOS(i);
-      if(formed>0){
-        // current player gets points and plays again
-        sosState.score[sosState.turn-1]+=formed;
-      } else {
-        sosState.turn = sosState.turn===1?2:1;
-      }
+      if(formed>0){ sosState.score[sosState.turn-1]+=formed; }
+      else { sosState.turn = sosState.turn===1?2:1; }
       updateSosUI();
       if(sosState.board.every(Boolean)){
         const status = sosState.score[0]===sosState.score[1] ? 'Draw!' : (sosState.score[0]>sosState.score[1] ? 'Player 1 wins!' : 'Player 2 wins!');
@@ -218,21 +238,16 @@ This single file is self-contained and mobile-friendly.
       }
     }
     function countNewSOS(idx){
-      // returns number of new SOS sequences created by placing at idx
       const s = sosState.size; const r = Math.floor(idx/s), c = idx % s; let count=0;
       const get = (rr,cc)=>{ if(rr<0||cc<0||rr>=s||cc>=s) return null; return sosState.board[rr*s+cc]; }
-      // check 8 directions for pattern S-O-S with the newly placed cell being any of the three positions where required
-      // We'll check every triple where idx is part of it.
       const dirs = [[0,1],[1,0],[1,1],[1,-1]];
       for(const [dr,dc] of dirs){
-        // three positions: (i-2),(i-1),(i) and (i-1),(i),(i+1) and (i),(i+1),(i+2) but only triples where all in bounds
         const triples = [ [-2,-1,0], [-1,0,1], [0,1,2] ];
         for(const t of triples){
           const coords = t.map(delta=>[r + delta*dr, c + delta*dc]);
           if(coords.some(([rr,cc])=>rr<0||cc<0||rr>=s||cc>=s)) continue;
           const chars = coords.map(([rr,cc])=>get(rr,cc));
           if(chars[0]==='S' && chars[1]==='O' && chars[2]==='S'){
-            // ensure that at least one of the positions equals the idx (we only want sequences that include the new placement)
             const indices = coords.map(([rr,cc])=>rr*s+cc);
             if(indices.includes(idx)) count++;
           }
@@ -241,34 +256,15 @@ This single file is self-contained and mobile-friendly.
       return count;
     }
     function updateSosUI(){
-      const s=sosState.size;
-      // render cells
-      const cells=document.querySelectorAll('#sos-board .sos-cell');
-      cells.forEach(c=>{
-        const i = c.dataset.index; c.textContent = sosState.board[i] || '';
-      });
+      const s = sosState.size;
+      const cells = document.querySelectorAll('#sos-board .sos-cell');
+      cells.forEach(c=>{ const i = c.dataset.index; const val = sosState.board[i] || ''; c.textContent = val; c.classList.remove('s','o'); if(val==='S') c.classList.add('s'); if(val==='O') c.classList.add('o'); });
       document.getElementById('sos-p1').textContent = sosState.score[0];
       document.getElementById('sos-p2').textContent = sosState.score[1];
       document.getElementById('sos-status').textContent = 'Turn: Player ' + sosState.turn;
       document.getElementById('sos-current').textContent = sosState.selected;
     }
-    function resetSOS(){ sosState=null; document.getElementById('sos-board').innerHTML=''; initSOS(); document.getElementById('sos-status').textContent=''; }
-
-    // ---- RPS ----
-    let rpsState;
-    function initRPS(){ if(rpsState) return; rpsState={you:0,cpu:0}; updateRpsUI(); }
-    function playRps(choice){
-      const opts=['rock','paper','scissors'];
-      const cpu = opts[Math.floor(Math.random()*3)];
-      let result='';
-      if(choice===cpu) result='Draw';
-      else if((choice==='rock'&&cpu==='scissors') || (choice==='scissors'&&cpu==='paper') || (choice==='paper'&&cpu==='rock')){ result='You win'; rpsState.you++; }
-      else { result='CPU wins'; rpsState.cpu++; }
-      document.getElementById('rps-status').textContent = `You: ${choice} — CPU: ${cpu} → ${result}`;
-      updateRpsUI();
-    }
-    function updateRpsUI(){ document.getElementById('rps-you').textContent = rpsState.you; document.getElementById('rps-cpu').textContent = rpsState.cpu; }
-    function resetRPS(){ rpsState={you:0,cpu:0}; updateRpsUI(); document.getElementById('rps-status').textContent=''; }
+    function resetSOS(fullReset){ sosState=null; document.getElementById('sos-board').innerHTML=''; initSOS(); if(fullReset){ document.getElementById('sos-p1').textContent=0; document.getElementById('sos-p2').textContent=0; document.getElementById('sos-status').textContent=''; }}
 
     // Start with TicTacToe
     switchGame('tictactoe');
